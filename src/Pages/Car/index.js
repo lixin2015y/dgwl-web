@@ -7,7 +7,9 @@ const {Option} = Select;
 class Car extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {}
+        this.state = {
+            carLoading: false
+        }
     }
 
     column = [
@@ -36,6 +38,7 @@ class Car extends React.Component {
 
     render() {
         const {getFieldDecorator} = this.props.form;
+        const {carLoading, data} = this.state;
         return (
             <Layout style={{height: '100%', width: '100%', overflow: 'inherit', background: '#fff'}}>
                 <Card style={{borderRadius: '10px', background: '#F7F7F7'}}>
@@ -74,7 +77,7 @@ class Car extends React.Component {
                 </Card>
                 <Row>
                     <div style={{marginTop: '20px', height: 'calc(100% - 280px)'}}>
-                        <Table columns={this.column} bordered/>
+                        <Table columns={this.column} bordered loading={carLoading} dataSource={data}/>
                     </div>
                 </Row>
 
@@ -82,11 +85,21 @@ class Car extends React.Component {
         )
     }
 
-    handleSubmit = () => {
-        sendRequest('/car/getCars').then(r => {
+    handleSubmit = (e) => {
+        e.preventDefault()
+        this.query()
+    }
 
+    query = () => {
+        this.setState({
+            carLoading: true
         })
-
+        sendRequest('/car/getCars').then(data => {
+            this.setState({
+                data: data.data,
+                carLoading: false
+            })
+        })
     }
 }
 
