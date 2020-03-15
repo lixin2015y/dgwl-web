@@ -1,0 +1,16 @@
+.container {
+    background-image: url(../../Assets/img/loginBG.JPG);
+    widows: 100%;
+    height: 100vh;
+    position: relative;
+}
+
+.login-card {
+    position: absolute;
+    top: 100px;
+    right: 150px;
+}
+
+.login-form {
+    max-width: 500px;
+}
