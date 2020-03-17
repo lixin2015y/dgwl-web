@@ -73,6 +73,7 @@ class Car extends React.Component {
         this.query()
     }
 
+    //https://www.jianshu.com/p/d70bbe4cee38
     render() {
         const {getFieldDecorator} = this.props.form;
         const {carLoading, data, modalVisible, tableIndex, changeEditModalVisible, editModalVisible} = this.state;
@@ -182,6 +183,7 @@ class Car extends React.Component {
     showEditModal = (record) => {
         const editModalVisible = !this.state.editModalVisible
         this.setState({editModalVisible})
+        alert(this.editFormRef)
     }
 
     handleSubmit = (e) => {
