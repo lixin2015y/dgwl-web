@@ -5,11 +5,11 @@ import Statistics from '../Pages/statistics'
 import {createBrowserHistory} from 'history'
 import LoginPage from "../Pages/LoginPage";
 import "../NetRequest/api"
-import {sendRequest} from "../NetRequest/api";
 import PrivateRoute from "./private";
 import RegisterPage from "../Pages/RegisterPage";
 import Car from "../Pages/Car";
 import House from "../Pages/House";
+import Driver from "../Pages/Driver"
 
 export default class App extends React.Component {
 
@@ -29,7 +29,7 @@ export default class App extends React.Component {
                                 <Switch>
                                     <PrivateRoute path="/system/statistics" component={Statistics}/>
                                     <PrivateRoute path="/system/car" component={Car}/>
-                                    <PrivateRoute path="/system/driver" component={Statistics}/>
+                                    <PrivateRoute path="/system/driver" component={Driver}/>
                                     <PrivateRoute path="/system/house" component={House}/>
                                 </Switch>
                             </HomePage>

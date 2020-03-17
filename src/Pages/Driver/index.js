@@ -24,33 +24,36 @@ class Car extends React.Component {
         this.state = {
             carLoading: true,
             modalVisible: false,
-            editModalVisible: false,
             tableIndex: 0
         }
     }
 
     column = [
         {
-            title: '车辆id',
+            title: '司机id',
             dataIndex: 'id',
             key: 'id'
         }, {
-            title: '车牌号',
-            dataIndex: 'number',
-            key: 'number'
+            title: '姓名',
+            dataIndex: 'name',
+            key: 'name'
         }, {
-            title: '承载量(吨)',
-            dataIndex: 'load',
-            key: 'load'
+            title: '年龄',
+            dataIndex: 'age',
+            key: 'age'
         }, {
-            title: '车辆类型',
-            dataIndex: 'type',
-            key: 'type'
+            title: '电话',
+            dataIndex: 'tel',
+            key: 'tel'
         }, {
-            title: '容积(立方米)',
-            dataIndex: 'capacity',
-            key: 'capacity'
+            title: '身份证号',
+            dataIndex: 'cardId',
+            key: 'cardId'
         }, {
+            title: '驾龄',
+            dataIndex: 'driveAge',
+            key: 'driveAge'
+        },{
             title: '创建时间',
             dataIndex: 'updateTime',
             key: 'updateTime'
@@ -58,14 +61,9 @@ class Car extends React.Component {
             title: '操作',
             key: 'operation',
             render: (text, record) => (
-                <div>
-                    <Button type={"link"} onClick={() => this.showEditModal(record)}>edit</Button>
-                    <Popconfirm title="Sure to delete?" onConfirm={() => this.handleDelete(record.id)}>
-                        <a>Delete</a>
-                    </Popconfirm>
-                </div>
-
-            )
+                <Popconfirm title="Sure to delete?" onConfirm={() => this.handleDelete(record.id)}>
+                    <a>Delete</a>
+                </Popconfirm>)
         }
     ]
 
@@ -75,7 +73,7 @@ class Car extends React.Component {
 
     render() {
         const {getFieldDecorator} = this.props.form;
-        const {carLoading, data, modalVisible, tableIndex, changeEditModalVisible, editModalVisible} = this.state;
+        const {carLoading, data, modalVisible, tableIndex} = this.state;
         return (
             <Layout style={{height: '100%', width: '100%', overflow: 'inherit', background: '#fff'}}>
                 <Card style={{borderRadius: '10px', background: '#F7F7F7'}}>
@@ -123,22 +121,15 @@ class Car extends React.Component {
                 </Card>
                 <Row>
                     <div style={{marginTop: '20px', height: 'calc(100% - 280px)'}}>
-                        <Table columns={this.column} bordered loading={carLoading} dataSource={data}
+                        <Table columns={this.column} loading={carLoading} dataSource={data}
                                key={tableIndex} rowKey={record => record.id}/>
                     </div>
                 </Row>
                 <Modal title={'添加新车辆'} visible={modalVisible} onCancel={this.changeModalVisible}
-                       onOk={this.handleModalSubmit} okText={'添加'} cancelText={'取消'} destroyOnClose
+                       onOk={this.handleModalSubmit} okText={'添加'} cancelText={'取消'}
                 >
                     <ModaForm wrappedComponentRef={(ref) => {
                         this.formRef = ref
-                    }}/>
-                </Modal>
-                <Modal title={'修改车辆信息'} visible={editModalVisible} onCancel={this.showEditModal}
-                       onOk={this.handleModalSubmit} okText={'添加'} cancelText={'取消'} destroyOnClose
-                >
-                    <ModaForm wrappedComponentRef={(ref) => {
-                        this.editFormRef = ref
                     }}/>
                 </Modal>
             </Layout>
@@ -177,11 +168,6 @@ class Car extends React.Component {
     changeModalVisible = () => {
         const modalVisible = !this.state.modalVisible
         this.setState({modalVisible})
-    }
-
-    showEditModal = (record) => {
-        const editModalVisible = !this.state.editModalVisible
-        this.setState({editModalVisible})
     }
 
     handleSubmit = (e) => {
@@ -229,7 +215,7 @@ const ModaForm = Form.create()(
         render() {
             const {getFieldDecorator} = this.props.form
             return (
-                <Form {...this.formItemLayout}>
+                <Form {...this.formItemLayout} wrappedComponentRef={(form) => this.modalForm = form}>
                     <Form.Item label={'车牌号：'}>
                         {getFieldDecorator('number', {rules: [{required: true, message: '此项不能为空！'}]})
                         (<Input placeholder="number" style={{width: '30%'}}/>)}
