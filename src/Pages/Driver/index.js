@@ -18,42 +18,40 @@ import {sendRequest} from "../../NetRequest/api";
 
 const {Option} = Select;
 
-class Car extends React.Component {
+class Driver extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             carLoading: true,
-            modalVisible: false,
-            tableIndex: 0
+            addModalVisible: false,
+            editModalVisible: false,
+            tableIndex: 0,
+            editRecord: {}
         }
     }
 
     column = [
         {
-            title: '司机id',
+            title: '车辆id',
             dataIndex: 'id',
             key: 'id'
         }, {
-            title: '姓名',
-            dataIndex: 'name',
-            key: 'name'
+            title: '车牌号',
+            dataIndex: 'number',
+            key: 'number'
         }, {
-            title: '年龄',
-            dataIndex: 'age',
-            key: 'age'
+            title: '承载量(吨)',
+            dataIndex: 'load',
+            key: 'load'
         }, {
-            title: '电话',
-            dataIndex: 'tel',
-            key: 'tel'
+            title: '车辆类型',
+            dataIndex: 'type',
+            key: 'type'
         }, {
-            title: '身份证号',
-            dataIndex: 'cardId',
-            key: 'cardId'
+            title: '容积(立方米)',
+            dataIndex: 'capacity',
+            key: 'capacity'
         }, {
-            title: '驾龄',
-            dataIndex: 'driveAge',
-            key: 'driveAge'
-        },{
             title: '创建时间',
             dataIndex: 'updateTime',
             key: 'updateTime'
@@ -61,9 +59,14 @@ class Car extends React.Component {
             title: '操作',
             key: 'operation',
             render: (text, record) => (
-                <Popconfirm title="Sure to delete?" onConfirm={() => this.handleDelete(record.id)}>
-                    <a>Delete</a>
-                </Popconfirm>)
+                <div>
+                    <Button type={"link"} onClick={() => this.changeEditModalVisible(record)}>edit</Button>
+                    <Popconfirm title="Sure to delete?" onConfirm={() => this.handleDelete(record.id)}>
+                        <a>Delete</a>
+                    </Popconfirm>
+                </div>
+
+            )
         }
     ]
 
@@ -73,7 +76,7 @@ class Car extends React.Component {
 
     render() {
         const {getFieldDecorator} = this.props.form;
-        const {carLoading, data, modalVisible, tableIndex} = this.state;
+        const {carLoading, data, addModalVisible, tableIndex, editModalVisible, editRecord} = this.state;
         return (
             <Layout style={{height: '100%', width: '100%', overflow: 'inherit', background: '#fff'}}>
                 <Card style={{borderRadius: '10px', background: '#F7F7F7'}}>
@@ -111,7 +114,7 @@ class Car extends React.Component {
                             </Col>
                             <Col span={3}>
                                 <Form.Item>
-                                    <Button type="primary" onClick={this.changeModalVisible}>
+                                    <Button type="primary" onClick={this.changeAddModalVisible}>
                                         添加
                                     </Button>
                                 </Form.Item>
@@ -121,17 +124,14 @@ class Car extends React.Component {
                 </Card>
                 <Row>
                     <div style={{marginTop: '20px', height: 'calc(100% - 280px)'}}>
-                        <Table columns={this.column} loading={carLoading} dataSource={data}
+                        <Table columns={this.column} bordered loading={carLoading} dataSource={data}
                                key={tableIndex} rowKey={record => record.id}/>
                     </div>
                 </Row>
-                <Modal title={'添加新车辆'} visible={modalVisible} onCancel={this.changeModalVisible}
-                       onOk={this.handleModalSubmit} okText={'添加'} cancelText={'取消'}
-                >
-                    <ModaForm wrappedComponentRef={(ref) => {
-                        this.formRef = ref
-                    }}/>
-                </Modal>
+                <ModaForm onOk={this.handleAddModalSubmit} modalVisible={addModalVisible} operation={'添加'}
+                          changeModalVisible={this.changeAddModalVisible}/>
+                <ModaForm onOk={this.handleEditModalSubmit} modalVisible={editModalVisible} operation={'编辑'}
+                          changeModalVisible={this.changeEditModalVisible} record={editRecord}/>
             </Layout>
         )
     }
@@ -148,26 +148,38 @@ class Car extends React.Component {
     }
 
 
-    handleModalSubmit = () => {
-        const {form} = this.formRef.props
-        form.validateFields((err, values) => {
-            if (!err) {
-                sendRequest('/car/addCar', 'post', values).then((data) => {
-                    if (data.code === '0') {
-                        message.info('添加新车辆成功！！！')
-                        this.changeModalVisible()
-                        this.query()
-                    } else {
-                        message.error(data.message)
-                    }
-                })
+    handleAddModalSubmit = (values) => {
+        sendRequest('/car/addCar', 'post', values).then((data) => {
+            if (data.code === '0') {
+                message.info('添加新车辆成功！！！')
+                this.changeAddModalVisible()
+                this.query()
+            } else {
+                message.error(data.message)
             }
         })
     }
 
-    changeModalVisible = () => {
-        const modalVisible = !this.state.modalVisible
-        this.setState({modalVisible})
+    handleEditModalSubmit = (values) => {
+        sendRequest('/car/editCar', 'post', values).then((data) => {
+            if (data.code === '0') {
+                message.info('修改车辆成功！！！')
+                this.changeEditModalVisible({})
+                this.query()
+            } else {
+                message.error(data.message)
+            }
+        })
+    }
+
+    changeAddModalVisible = () => {
+        const addModalVisible = !this.state.addModalVisible
+        this.setState({addModalVisible})
+    }
+
+    changeEditModalVisible = (editRecord) => {
+        const editModalVisible = !this.state.editModalVisible
+        this.setState({editModalVisible, editRecord})
     }
 
     handleSubmit = (e) => {
@@ -197,9 +209,18 @@ class Car extends React.Component {
     }
 }
 
-export default Car = Form.create()(Car)
+export default Driver = Form.create()(Driver)
 
-const ModaForm = Form.create()(
+const ModaForm = Form.create({
+    mapPropsToFields: (props => {
+        return props.record ? {
+            number: Form.createFormField({value: props.record.number}),
+            type: Form.createFormField({value: props.record.type}),
+            load: Form.createFormField({value: props.record.load}),
+            capacity: Form.createFormField({value: props.record.capacity})
+        } : {}
+    })
+})(
     class extends Component {
         formItemLayout = {
             labelCol: {
@@ -212,38 +233,60 @@ const ModaForm = Form.create()(
             },
         }
 
+
+        handleOk = () => {
+            const {form, onOk} = this.props
+            form.validateFields((err, values) => {
+                if (!err) {
+                    values = this.props.record ? {...{id: this.props.record.id}, ...values} : values
+                    onOk(values)
+                }
+            })
+        }
+
+        handleCancel = () => {
+            const {form, changeModalVisible} = this.props
+            form.resetFields()
+            changeModalVisible()
+        }
+
         render() {
+            const {modalVisible, operation} = this.props
             const {getFieldDecorator} = this.props.form
             return (
-                <Form {...this.formItemLayout} wrappedComponentRef={(form) => this.modalForm = form}>
-                    <Form.Item label={'车牌号：'}>
-                        {getFieldDecorator('number', {rules: [{required: true, message: '此项不能为空！'}]})
-                        (<Input placeholder="number" style={{width: '30%'}}/>)}
-                    </Form.Item>
-                    <Form.Item label={'类型：'}>
-                        {getFieldDecorator('type', {
-                            initialValue: '小型车',
-                            rules: [{required: true, message: '请填写车类型!'}],
-                        })
-                        (<Select style={{width: '100px'}}>
-                            <Option value="小型车">小型车</Option>
-                            <Option value="中型车">中型车</Option>
-                            <Option value="大型车">大型车</Option>
-                        </Select>)}
-                    </Form.Item>
-                    <Form.Item label={'承载吨数以上：'}>
-                        {getFieldDecorator('load', {
-                            initialValue: 5, rules: [{required: true, message: '此项不能为空！'}]
-                        })
-                        (<InputNumber/>)}
-                    </Form.Item>
-                    <Form.Item label={'容积(立方米)：'}>
-                        {getFieldDecorator('capacity', {
-                            initialValue: 5, rules: [{required: true, message: '此项不能为空!'}]
-                        })
-                        (<InputNumber/>)}
-                    </Form.Item>
-                </Form>
+                <Modal title={`${operation}新车辆`} visible={modalVisible} onCancel={this.handleCancel}
+                       onOk={this.handleOk} okText={`${operation}`} cancelText={'取消'} destroyOnClose
+                >
+                    <Form {...this.formItemLayout}>
+                        <Form.Item label={'车牌号：'}>
+                            {getFieldDecorator('number', {rules: [{required: true, message: '此项不能为空！'}]})
+                            (<Input placeholder="number" style={{width: '30%'}}/>)}
+                        </Form.Item>
+                        <Form.Item label={'类型：'}>
+                            {getFieldDecorator('type', {
+                                initialValue: '小型车',
+                                rules: [{required: true, message: '请填写车类型!'}],
+                            })
+                            (<Select style={{width: '100px'}}>
+                                <Option value="小型车">小型车</Option>
+                                <Option value="中型车">中型车</Option>
+                                <Option value="大型车">大型车</Option>
+                            </Select>)}
+                        </Form.Item>
+                        <Form.Item label={'承载吨数以上：'}>
+                            {getFieldDecorator('load', {
+                                initialValue: 5, rules: [{required: true, message: '此项不能为空！'}]
+                            })
+                            (<InputNumber/>)}
+                        </Form.Item>
+                        <Form.Item label={'容积(立方米)：'}>
+                            {getFieldDecorator('capacity', {
+                                initialValue: 5, rules: [{required: true, message: '此项不能为空!'}]
+                            })
+                            (<InputNumber/>)}
+                        </Form.Item>
+                    </Form>
+                </Modal>
             )
         }
     }
