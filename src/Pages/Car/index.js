@@ -255,7 +255,7 @@ const ModaForm = Form.create({
             const {getFieldDecorator} = this.props.form
             return (
                 <Modal title={`${operation}新车辆`} visible={modalVisible} onCancel={this.handleCancel}
-                       onOk={this.handleOk} okText={`${operation}`} cancelText={'取消'} destroyOnClose
+                       onOk={this.handleOk} okText={'确定'} cancelText={'取消'} destroyOnClose
                 >
                     <Form {...this.formItemLayout}>
                         <Form.Item label={'车牌号：'}>
