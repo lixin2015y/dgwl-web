@@ -2,7 +2,7 @@ import {Route, Switch, Redirect, Router} from 'react-router-dom';
 import React from 'react';
 import HomePage from '../Pages/HomePage'
 import Statistics from '../Pages/statistics'
-import {createBrowserHistory} from 'history'
+import {createBrowserHistory} from 'history';
 import LoginPage from "../Pages/LoginPage";
 import "../NetRequest/api"
 import PrivateRoute from "./private";
@@ -10,6 +10,7 @@ import RegisterPage from "../Pages/RegisterPage";
 import Car from "../Pages/Car";
 import House from "../Pages/House";
 import Driver from "../Pages/Driver"
+import MyOrder from "../Pages/MyOrder"
 
 export default class App extends React.Component {
 
@@ -31,6 +32,7 @@ export default class App extends React.Component {
                                     <PrivateRoute path="/system/car" component={Car}/>
                                     <PrivateRoute path="/system/driver" component={Driver}/>
                                     <PrivateRoute path="/system/house" component={House}/>
+                                    <PrivateRoute path="/system/myOrder" component={MyOrder}/>
                                 </Switch>
                             </HomePage>
                         )

@@ -26,7 +26,12 @@ class LoginPage extends React.Component {
                         sessionStorage.setItem("sessionId", data.data)
                         this.remembered()
                         message.info("登陆成功！！！", 1, () => {
-                            window.location.pathname = '/'
+                            if (values.userName === 'admin') {
+                                window.location.pathname = '/system/statistics'
+                            } else {
+                                window.location.pathname = '/system/myOrder'
+
+                            }
                         })
                     } else {
                         message.info(data.message)
@@ -37,15 +42,15 @@ class LoginPage extends React.Component {
     }
 
     init = () => {
-        let name=document.getElementById('userName').value;
-        if(name){
-            for(let i=0; i<window.localStorage.length; i++){
-                if(localStorage.key(i) === name){
+        let name = document.getElementById('userName').value;
+        if (name) {
+            for (let i = 0; i < window.localStorage.length; i++) {
+                if (localStorage.key(i) === name) {
                     this.setState({
                         userName: name,
                         userPwd: localStorage.getItem(name)
                     })
-                    this.props.form.setFieldsValue({'password':localStorage.getItem(name)})
+                    this.props.form.setFieldsValue({'password': localStorage.getItem(name)})
                 }
             }
         }

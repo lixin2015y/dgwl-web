@@ -14,6 +14,7 @@ const PrivateRoute = ({component: Component, ...props}) => {
                 pathname: '/login'
             }}/>
         }
+        return <Component/>
     }}/>
 }
 export default PrivateRoute

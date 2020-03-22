@@ -1,3 +1,4 @@
+/* eslint-disable no-unexpected-multiline */
 import React, {Component} from 'react';
 import {
     Button,
@@ -71,13 +72,13 @@ class Driver extends React.Component {
                 <div>
                     <Button type={"link"} onClick={() => this.changeEditModalVisible(record)}>edit</Button>
                     <Popconfirm title="Sure to delete?" onConfirm={() => this.handleDelete(record.id)}>
-                        <a>Delete</a>
+                        <Button type={"link"}>Delete</Button>
                     </Popconfirm>
                 </div>
 
             )
         }
-    ]
+    ];
 
     componentDidMount() {
         this.query()
@@ -135,62 +136,62 @@ class Driver extends React.Component {
     }
 
     handleDelete = (id) => {
-        sendRequest('/car/deleteCar', 'post', {
+        sendRequest('/driver/deleteDriver', 'post', {
             id: id
         }).then(data => {
             if (data.code === '0') {
-                message.info("删除成功！")
+                message.info("删除成功！");
                 this.query()
             }
         })
-    }
+    };
 
 
     handleAddModalSubmit = (values) => {
         sendRequest('/driver/addDriver', 'post', values).then((data) => {
             if (data.code === '0') {
-                message.info('添加新司机成功！！！')
-                this.changeAddModalVisible()
+                message.info('添加新司机成功！！！');
+                this.changeAddModalVisible();
                 this.query()
             } else {
                 message.error(data.message)
             }
         })
-    }
+    };
 
     handleEditModalSubmit = (values) => {
-        sendRequest('/car/editCar', 'post', values).then((data) => {
+        sendRequest('/driver/editDriver', 'post', values).then((data) => {
             if (data.code === '0') {
-                message.info('修改车辆成功！！！')
-                this.changeEditModalVisible({})
+                message.info('修改车辆成功！！！');
+                this.changeEditModalVisible({});
                 this.query()
             } else {
                 message.error(data.message)
             }
         })
-    }
+    };
 
     changeAddModalVisible = () => {
-        const addModalVisible = !this.state.addModalVisible
+        const addModalVisible = !this.state.addModalVisible;
         this.setState({addModalVisible})
-    }
+    };
 
     changeEditModalVisible = (editRecord) => {
-        const editModalVisible = !this.state.editModalVisible
+        const editModalVisible = !this.state.editModalVisible;
         this.setState({editModalVisible, editRecord})
-    }
+    };
 
     handleSubmit = (e) => {
-        e.preventDefault()
+        e.preventDefault();
         this.query()
-    }
+    };
 
     query = () => {
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 this.setState({
                     carLoading: true
-                })
+                });
                 sendRequest('/driver/getDrivers', 'post', {
                     name: values.name,
                     driveAge: values.driveAge
@@ -210,14 +211,16 @@ class Driver extends React.Component {
 export default Driver = Form.create()(Driver)
 
 const ModaForm = Form.create({
-    // mapPropsToFields: (props => {
-    //     return props.record ? {
-    //         number: Form.createFormField({value: props.record.number}),
-    //         type: Form.createFormField({value: props.record.type}),
-    //         load: Form.createFormField({value: props.record.load}),
-    //         capacity: Form.createFormField({value: props.record.capacity})
-    //     } : {}
-    // })
+    mapPropsToFields: (props => {
+        return props.record ? {
+            name: Form.createFormField({value: props.record.name}),
+            age: Form.createFormField({value: props.record.age}),
+            tel: Form.createFormField({value: props.record.tel}),
+            cardId: Form.createFormField({value: props.record.cardId}),
+            driveAge: Form.createFormField({value: props.record.driveAge}),
+            carId: Form.createFormField({value: props.record.hasCar})
+        } : {}
+    })
 })(
     class extends Component {
         formItemLayout = {
@@ -229,78 +232,76 @@ const ModaForm = Form.create({
                 xs: {span: 24},
                 sm: {span: 16},
             },
-        }
+        };
 
 
         handleOk = () => {
-            const {form, onOk} = this.props
+            const {form, onOk} = this.props;
             form.validateFields((err, values) => {
                 if (!err) {
-                    values = this.props.record ? {...{id: this.props.record.id}, ...values} : values
+                    values = this.props.record ? {...{id: this.props.record.id}, ...values} : values;
                     onOk(values)
                 }
             })
-        }
+        };
 
         handleCancel = () => {
-            const {form, changeModalVisible} = this.props
-            form.resetFields()
+            const {form, changeModalVisible} = this.props;
+            form.resetFields();
             changeModalVisible()
-        }
+        };
 
         render() {
-            const {modalVisible, operation, carData} = this.props
-            const {getFieldDecorator} = this.props.form
-            return (
-                <Modal title={`${operation}司机`} visible={modalVisible} onCancel={this.handleCancel}
-                       onOk={this.handleOk} okText={`${operation}`} cancelText={'取消'} destroyOnClose
-                >
-                    <Form {...this.formItemLayout}>
-                        <Form.Item label={'姓名：'}>
-                            {getFieldDecorator('name', {rules: [{required: true, message: '此项不能为空！'}]})
-                            (<Input placeholder="name" style={{width: '50%'}}/>)}
-                        </Form.Item>
-                        <Form.Item label={'年龄：'}>
-                            {getFieldDecorator('age', {
-                                initialValue: 18, rules: [{required: true, message: '此项不能为空！'}]
-                            })
-                            (<InputNumber/>)}
-                        </Form.Item>
-                        <Form.Item label={'电话号码：'}>
-                            {getFieldDecorator('tel', {
-                                initialValue: 5, rules: [{required: true, message: '此项不能为空!'}]
-                            })
-                            (<Input/>)}
-                        </Form.Item>
-                        <Form.Item label={'身份证号：'}>
-                            {getFieldDecorator('cardId', {
-                                initialValue: 5, rules: [{required: true, message: '此项不能为空!'}]
-                            })
-                            (<Input placeholder="身份证号" style={{width: '50%'}}/>)}
-                        </Form.Item>
-                        <Form.Item label={'驾龄：'}>
-                            {getFieldDecorator('driveAge', {
-                                initialValue: 5, rules: [{required: true, message: '此项不能为空!'}]
-                            })
-                            (<InputNumber/>)}
-                        </Form.Item>
-                        <Form.Item label={'配车：'}>
-                            {getFieldDecorator('carId', {
-                                initialValue: 0,
-                                rules: [{required: true, message: '配车!'}],
-                            })
-                            (<Select style={{width: '100px'}}>
-                                <Option value={0}>暂不配车</Option>
-                                {
-                                    carData.map((car) => {
-                                        return (<Option value={car.id} key={car.id}>{car.number}</Option>)
-                                    })
-                                }
-                            </Select>)}
-                        </Form.Item>
-                    </Form>
-                </Modal>
-            )
+            const {modalVisible, operation, carData} = this.props;
+            const {getFieldDecorator} = this.props.form;
+            return <Modal title={`${operation}司机`} visible={modalVisible} onCancel={this.handleCancel}
+                          onOk={this.handleOk} okText={`${operation}`} cancelText={'取消'} destroyOnClose
+            >
+                <Form {...this.formItemLayout}>
+                    <Form.Item label={'姓名：'}>
+                        {getFieldDecorator('name', {rules: [{required: true, message: '此项不能为空！'}]})
+                        (<Input placeholder="name" style={{width: '40%'}}/>)}
+                    </Form.Item>
+                    <Form.Item label={'年龄：'}>
+                        {getFieldDecorator('age', {
+                            initialValue: 18, rules: [{required: true, message: '此项不能为空！'}]
+                        })
+                        (<InputNumber/>)}
+                    </Form.Item>
+                    <Form.Item label={'电话号码：'}>
+                        {getFieldDecorator('tel', {
+                            initialValue: 5, rules: [{required: true, message: '此项不能为空!'}]
+                        })
+                        (<Input style={{width: '40%'}}/>)}
+                    </Form.Item>
+                    <Form.Item label={'身份证号：'}>
+                        {getFieldDecorator('cardId', {
+                            initialValue: 5, rules: [{required: true, message: '此项不能为空!'}]
+                        })
+                        (<Input placeholder="身份证号" style={{width: '50%'}}/>)}
+                    </Form.Item>
+                    <Form.Item label={'驾龄：'}>
+                        {getFieldDecorator('driveAge', {
+                            initialValue: 5, rules: [{required: true, message: '此项不能为空!'}]
+                        })
+                        (<InputNumber style={{width: '40%'}}/>)}
+                    </Form.Item>
+                    <Form.Item label={'配车：'}>
+                        {getFieldDecorator('carId', {
+                            initialValue: 0,
+                            rules: [{required: true, message: '配车!'}],
+                        })
+                        (<Select style={{width: '40%'}}>
+                            <Option value={0}>暂不配车</Option>
+                            {
+                                carData.map((car) => {
+                                    return (<Option value={car.id} key={car.id}>{car.number}</Option>)
+                                })
+                            }
+                        </Select>)}
+                    </Form.Item>
+                </Form>
+            </Modal>
         }
     }
-)
+);
