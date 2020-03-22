@@ -13,7 +13,16 @@ const {Header, Content, Footer, Sider} = Layout;
 export default class App extends React.Component {
 
     state = {
-        user: {}
+        user: {
+            id: 1,
+            address: '',
+            phone: '',
+
+            role: {
+                id: 1,
+                description: '管理员'
+            }
+        }
     };
 
     componentDidMount() {
@@ -23,11 +32,12 @@ export default class App extends React.Component {
     queryUser = () => {
         sendRequest('/user/getUser', 'post').then((data) => {
             const user = data.data;
-            this.setState({user: Object.keys(user).length === 0 ? {} : user}, () => {
-                if (Object.keys(this.state.user).length === 0) {
-                    window.location.pathname = '/login'
-                }
-            })
+            if (user === null) {
+                window.location.pathname = '/login'
+                return
+            } else {
+                this.setState({user},)
+            }
         })
     };
 
@@ -94,7 +104,7 @@ export default class App extends React.Component {
                             <img src={imgArr.log} alt="" width='170'/>
                         </div>
                         <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-                            {this.renderMenu(Object.keys(user).length !== 0 &&
+                            {this.renderMenu(user !== null && Object.keys(user).length !== 0 &&
                             user.role.id === 1 ? menu.systemMenu : menu.userMenu)}
                         </Menu>
                     </Sider>
@@ -102,7 +112,7 @@ export default class App extends React.Component {
                         <Header style={{background: '#fff', padding: 0}}>
                             <Dropdown overlay={interfaceList}>
                                 <h3 style={{color: '#f56a00', position: 'absolute', right: 100,}}>
-                                    {Object.keys(user).length !== 0 ? user.role.description + ':' + user.userName : ''}
+                                    {user !== null && Object.keys(user).length !== 0 ? user.role.description + ':' + user.userName : ''}
                                 </h3>
                             </Dropdown>
                         </Header>
