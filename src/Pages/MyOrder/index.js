@@ -31,6 +31,14 @@ class MyOrder extends React.Component {
             dataIndex: 'price',
             key: 'price'
         }, {
+            title: '司机',
+            dataIndex: 'driverName',
+            key: 'driverName'
+        }, {
+            title: '车辆',
+            dataIndex: 'carNumber',
+            key: 'carNumber'
+        }, {
             title: '时间',
             dataIndex: 'updateTime',
             key: 'updateTime'
@@ -70,7 +78,8 @@ class MyOrder extends React.Component {
                 <Button type="link" onClick={this.changeDrawerVisible}>下单</Button>
                 <Table columns={this.column} pagination={false} dataSource={orderData}
                        rowKey={tableIndex} key={tableIndex}/>
-                <OrderDrawer onClose={this.changeDrawerVisible} drawerVisible={drawerVisible}/>
+                <OrderDrawer onClose={this.changeDrawerVisible} drawerVisible={drawerVisible}
+                             queryOrder={this.queryOrder}/>
             </Layout>
         )
     }
@@ -93,12 +102,13 @@ const OrderDrawer = Form.create()(
 
         handleSubmit = (e) => {
             e.preventDefault();
-            const {form, onClose} = this.props;
+            const {form, onClose, queryOrder} = this.props;
             form.validateFields((err, values) => {
                 if (!err) {
                     values.to = values.to.join('-');
                     sendRequest('/order/addOrder', 'post', values).then(data => {
                         if (data.code === '0') {
+                            queryOrder()
                             onClose();
                             form.resetFields();
                             message.info("提交成功")
