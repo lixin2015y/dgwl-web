@@ -23,6 +23,10 @@ class MyOrder extends React.Component {
             dataIndex: 'goodsWeight',
             key: 'goodsWeight'
         }, {
+            title: '货物体积',
+            dataIndex: 'goodsCapacity',
+            key: 'goodsCapacity'
+        }, {
             title: '货物状态',
             dataIndex: 'status',
             key: 'status'
@@ -38,6 +42,10 @@ class MyOrder extends React.Component {
             title: '车辆',
             dataIndex: 'carNumber',
             key: 'carNumber'
+        }, {
+            title: '运送方式',
+            dataIndex: 'method',
+            key: 'method'
         }, {
             title: '时间',
             dataIndex: 'updateTime',

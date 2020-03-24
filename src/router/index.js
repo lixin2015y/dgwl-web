@@ -11,6 +11,7 @@ import Car from "../Pages/Car";
 import House from "../Pages/House";
 import Driver from "../Pages/Driver"
 import MyOrder from "../Pages/MyOrder"
+import Order from "../Pages/Order";
 
 export default class App extends React.Component {
 
@@ -33,6 +34,7 @@ export default class App extends React.Component {
                                     <PrivateRoute path="/system/driver" component={Driver}/>
                                     <PrivateRoute path="/system/house" component={House}/>
                                     <PrivateRoute path="/system/myOrder" component={MyOrder}/>
+                                    <PrivateRoute path="/system/order" component={Order}/>
                                 </Switch>
                             </HomePage>
                         )

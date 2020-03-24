@@ -7,7 +7,7 @@ const systemMenu = [
     },
     {
         icon: "desktop",
-        path: "/system/office",
+        path: "/system/order",
         name: "订单管理",
         key: "order"
     },
