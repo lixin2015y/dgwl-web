@@ -60,11 +60,10 @@ class Order extends React.Component {
             key: 'operation',
             render: (text, record) => (
                 <div>
-                    <Button type={"link"}
+                    <Button type={"link"} disabled={record.status !== '待发货'}
                             onClick={() => this.setState({editOrder: record, modalVisible: true})}>发货</Button>
                     <Button type={"link"} onClick={() => this.deleteOrder(record)}>删除</Button>
                 </div>
-
             )
         }
     ]
@@ -162,6 +161,12 @@ const ModaForm = Form.create()(
             form.validateFields((err, values) => {
                 if (!err) {
                     onOk({...{id: record.id}, ...values})
+                    sendRequest('/order/getDriversAndHouse').then(data => {
+                        this.setState({
+                            driverData: data.data.driverData,
+                            houseData: data.data.houseData
+                        })
+                    })
                 }
             })
         }

@@ -1,7 +1,7 @@
 const systemMenu = [
     {
         icon: "pie-chart",
-        path: "/system/home",
+        path: "/system/statistics",
         name: "数据统计",
         key: "count"
     },

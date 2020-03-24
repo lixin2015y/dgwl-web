@@ -1,19 +1,5 @@
 import React, {Component} from 'react';
-import {
-    Button,
-    Card,
-    Col,
-    Form,
-    Input,
-    InputNumber,
-    Layout,
-    message,
-    Modal,
-    Popconfirm,
-    Row,
-    Select,
-    Table
-} from "antd";
+import {Button, Card, Col, Form, Input, InputNumber, Layout, message, Modal, Popconfirm, Row, Table} from "antd";
 import {sendRequest} from "../../NetRequest/api";
 import Area from "../area";
 
@@ -25,7 +11,10 @@ class House extends React.Component {
             addModalVisible: false,
             editModalVisible: false,
             tableIndex: 0,
-            editRecord: {}
+            editRecord: {},
+            orderViewVisible: false,
+            editHouseOrder: {},
+            houseOrderData: []
         }
     }
 
@@ -36,8 +25,12 @@ class House extends React.Component {
             key: 'id'
         }, {
             title: '大仓名称',
-            dataIndex: 'name',
-            key: 'name'
+            key: 'name',
+            render: (text, record) => {
+                return <Button type={"link"} onClick={() => {
+                    this.show(record)
+                }}>{record.name}</Button>
+            }
         }, {
             title: '地址',
             dataIndex: 'address',
@@ -75,7 +68,10 @@ class House extends React.Component {
 
     render() {
         const {getFieldDecorator} = this.props.form;
-        const {carLoading, data, addModalVisible, tableIndex, editModalVisible, editRecord} = this.state;
+        const {
+            carLoading, data, addModalVisible, tableIndex, editModalVisible, editRecord, orderViewVisible,
+            editHouseOrder, houseOrderData
+        } = this.state;
         return (
             <Layout style={{height: '100%', width: '100%', overflow: 'inherit', background: '#fff'}}>
                 <Card style={{borderRadius: '10px', background: '#F7F7F7'}}>
@@ -126,9 +122,26 @@ class House extends React.Component {
                           changeModalVisible={this.changeAddModalVisible}/>
                 <ModaForm onOk={this.handleEditModalSubmit} modalVisible={editModalVisible} operation={'编辑'}
                           changeModalVisible={this.changeEditModalVisible} record={editRecord}/>
+
+                <OrderView visible={orderViewVisible} changeModalVisible={this.changeShowVisible} data={houseOrderData}
+                           record={editHouseOrder}/>
             </Layout>
         )
     }
+
+    show = (record) => {
+        this.queryHouseOrderData(record.id)
+        this.setState({
+            orderViewVisible: true
+        })
+    }
+
+    changeShowVisible = () => {
+        this.setState({
+            orderViewVisible: !this.state.orderViewVisible
+        })
+    }
+
 
     handleDelete = (id) => {
         sendRequest('/house/deleteHouse', 'post', {
@@ -202,6 +215,17 @@ class House extends React.Component {
                 })
             }
         })
+    }
+
+    queryHouseOrderData = (id) => {
+        sendRequest('/order/getOrderInHouse', 'post', {houseId: id})
+            .then(r => r.data).then(
+            data => {
+                this.setState({
+                    houseOrderData: data
+                })
+            }
+        )
     }
 }
 
@@ -283,3 +307,95 @@ const ModaForm = Form.create({
         }
     }
 )
+
+class OrderView extends Component {
+
+
+    column = [
+        {
+            title: 'id',
+            dataIndex: 'id',
+            key: 'id'
+        }, {
+            title: '目的地',
+            dataIndex: 'to',
+            key: 'to'
+        }, {
+            title: '货物名称',
+            dataIndex: 'goodsName',
+            key: 'goodsName'
+        }, {
+            title: '货物重量',
+            dataIndex: 'goodsWeight',
+            key: 'goodsWeight'
+        }, {
+            title: '货物体积',
+            dataIndex: 'goodsCapacity',
+            key: 'goodsCapacity'
+        }, {
+            title: '货物状态',
+            dataIndex: 'status',
+            key: 'status'
+        }, {
+            title: '预估价格',
+            dataIndex: 'price',
+            key: 'price'
+        }, {
+            title: '司机',
+            dataIndex: 'driverName',
+            key: 'driverName'
+        }, {
+            title: '车辆',
+            dataIndex: 'carNumber',
+            key: 'carNumber'
+        }, {
+            title: '传输方式',
+            dataIndex: 'method',
+            key: 'method'
+        }, {
+            title: '客户姓名',
+            dataIndex: 'userName',
+            key: 'userName'
+        }, {
+            title: '时间',
+            dataIndex: 'updateTime',
+            key: 'updateTime'
+        }, {
+            title: '操作',
+            key: 'operation',
+            render: (text, record) => (
+                <div>
+                    <Button type={"link"} onClick={() => {
+                        this.handleOrder(record)
+                    }}
+                    >{record.status === '已发出' ? `入库` : `出库`}</Button>
+                </div>
+
+            )
+        }
+    ]
+
+    handleOrder = (record) => {
+        record.status = record.status === '已发出' ? `已入库` : `已完成`
+        sendRequest('/order/handleOrder', 'post', record)
+            .then(data => data.data).then(data => {
+            this.setState({data})
+        })
+    }
+
+
+    handleCancel = () => {
+        const {changeModalVisible} = this.props
+        changeModalVisible()
+    }
+
+    render() {
+        const {visible, data} = this.props
+        return (
+            <Modal title={'订单处理'} visible={visible} onCancel={this.handleCancel} footer={false}
+                   destroyOnClose width={'60%'}>
+                <Table bordered columns={this.column} dataSource={data}/>
+            </Modal>
+        )
+    }
+}
