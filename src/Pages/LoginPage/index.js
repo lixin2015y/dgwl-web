@@ -97,7 +97,6 @@ class LoginPage extends React.Component {
                             })(
                                 <Checkbox onChange={this.checkedChange}>Remember me</Checkbox>
                             )}
-                            <Link to="/forgotPwd" style={{float: 'right'}}>Forgot password</Link>
                             <Button type="primary" htmlType="submit" style={{width: '100%'}}>
                                 Log in
                             </Button>
