@@ -66,6 +66,10 @@ class Driver extends React.Component {
             dataIndex: 'hasCar',
             key: 'hasCar'
         }, {
+            title: '订单',
+            dataIndex: 'hashOrder',
+            key: 'hashOrder'
+        }, {
             title: '操作',
             key: 'operation',
             render: (text, record) => (
